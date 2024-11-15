@@ -3,7 +3,9 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField]
     private InputField input;
+    private int guessChances = 7;
 
     private int num;
     private int countGuess;
@@ -11,44 +13,71 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private Text message;
     [SerializeField]
-    private GameObject button;
+    private GameObject PlayAgainButton;
+
     private void Awake()
     {
         input = GameObject.Find("Input").GetComponent<InputField>();
         num = Random.Range(1, 101);
-        message.text = "Guess The Number\nBetween 1 and 100";
+        message.text = "Unlock The Device by Guessing the Password\nBetween 1 and 100";
     }
 
-    public void getInput(string guess)
+    public void OnNumberButtonClick(int number)
     {
-        countGuess++;
-        compareGuesses(int.Parse(guess));
-        input.text = "";
+        input.text += number.ToString();
     }
 
-    void compareGuesses(int guess)
+    public void SubmitGuess()
+    {
+        if (int.TryParse(input.text, out int guess))
+        {
+            countGuess++;
+            guessChances--;
+            CompareGuesses(guess);
+            input.text = "";
+        }
+        else
+        {
+            message.text = "Please enter a valid number!";
+        }
+    }
+
+    private void CompareGuesses(int guess)
     {
         if (guess == num)
         {
-            message.text = "Your Guess Is Corret\nThe number was " + guess + "\nAnd It Took You " + countGuess + " Guess\nWanna Play Again?";
-            button.SetActive(true);
+            message.text = "YOU WON!\nIN " +countGuess+" TRIES\n\nThe Password was: " + num +"\n\nWant to play again?";
+            PlayAgainButton.SetActive(true);
         }
-        else if (guess < num)
+        else if (guessChances > 0)
         {
-            message.text = "Your Guess Is Less Than The Number Your Are Trying To Guess";
+            if (guess < num)
+            {
+                message.text = $"Your guess is too low!\nChances left: {guessChances}";
+            }
+            else
+            {
+                message.text = $"Your guess is too high!\nChances left: {guessChances}";
+            }
         }
-        else if (guess > num)
+        else
         {
-            message.text = "Your Guess Is Greater Than The Number Your Are Trying To Guess";
+            message.text = $"GAME OVER! You've used all your chances.\nThe Password was {num}.\n\nWant to play again?";
+            PlayAgainButton.SetActive(true);
         }
     }
 
-    public void playAgain()
+    public void PlayAgain()
     {
-        input = GameObject.Find("Input").GetComponent<InputField>();
         num = Random.Range(1, 101);
-        message.text = "Guess The Number\nBetween 1 and 100";
+        message.text = "Unlock The Device by Guessing the Password\nBetween 1 and 100";
         countGuess = 0;
-        button.SetActive(false);
+        guessChances = 7;
+        PlayAgainButton.SetActive(false);
+    }
+
+    public void ClearInput()
+    {
+        input.text = "";
     }
 }
