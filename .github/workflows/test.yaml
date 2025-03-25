@@ -1,16 +1,22 @@
 name: Experiments
 
-#on: [push, pull_request]
+on: [workflow_dispatch] # Allows manual execution
 
-on: [workflow_dispatch]
-  
 jobs:
-  Test:
-    name: Test
+  test:
+    name: Environment Test
     runs-on: ubuntu-latest
     steps:
-     - name: Checking Directory
-       run: |
-         pwd -P
-         which zip
-         zip --help
+      - name: Display Working Directory
+        run: pwd -P
+
+      - name: Check Installed Zip Utility
+        run: which zip
+
+      - name: Display Zip Help Command
+        run: zip --help
+
+      - name: Check System Information
+        run: |
+          uname -a
+          lsb_release -a || cat /etc/os-release
